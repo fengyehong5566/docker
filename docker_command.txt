@@ -1,0 +1,293 @@
+Usage:	docker COMMAND
+
+
+Options:
+      --config string      客户端本地配置文件的位置 (default "/root/.docker")
+  -D, --debug              启用debug模型
+      --help               显示帮助信息
+  -H, --host list          Daemon socket(s) to connect to (default [])
+  -l, --log-level string   设置日志级别 ("debug", "info", "warn", "error", "fatal") (default "info")
+      --tls                Use TLS; implied by --tlsverify
+      --tlscacert string   Trust certs signed only by this CA (default "/root/.docker/ca.pem")
+      --tlscert string     Path to TLS certificate file (default "/root/.docker/cert.pem")
+      --tlskey string      Path to TLS key file (default "/root/.docker/key.pem")
+      --tlsverify          Use TLS and verify the remote
+  -v, --version            显示版本信息
+
+Management Commands:
+	config      Manage Docker configs
+	container   Manage containers
+	image       Manage images
+	network     Manage networks
+	node        Manage Swarm nodes【管理群节点】
+	plugin      Manage plugins
+	secret      Manage Docker secrets
+	service     Manage services
+	stack       Manage Docker stacks
+	swarm       Manage Swarm【管理群】
+	system      Manage Docker
+	volume      Manage volumes
+
+
+
+Commands:
+	attach      Attach to a running container【连接到正在运行的容器】
+	build       Build an image from a Dockerfile【从Dockerfile构建镜像】
+	commit      Create a new image from a container's changes【从容器的更改中创建一个新映像】
+	cp          Copy files/folders between a container and the local filesystem
+	create      Create a new container
+	diff        Inspect changes on a container's filesystem【检查容器文件系统上的更改】
+	events      Get real time events from the server【从服务器获取实时事件】
+	exec        Run a command in a running container
+	export      Export a container's filesystem as a tar archive【将容器的文件系统导出为tar存档文件】
+	history     Show the history of an image
+	images      List images
+	import      Import the contents from a tarball to create a filesystem image
+	info        Display system-wide information【显示整个系统的信息】
+	inspect     Return low-level information on Docker objects【返回Docker对象的低级信息】
+	kill        Kill one or more running containers
+	load        Load an image from a tar archive or STDIN
+	login       Login to a Docker registry【登录到Docker注册表】
+	logout      Logout from a Docker registry
+	logs        Fetch the logs of a container【获取容器的日志】
+	pause       Pause all processes within one or more containers【暂停一个或多个容器中的所有进程】
+	port        List port mappings or a specific mapping for the container
+	ps          List containers
+	pull        Pull an image or a repository from a registry
+	push        Push an image or a repository to a registry
+	rename      Rename a container
+	restart     Restart one or more containers
+	rm          Remove one or more containers
+	rmi         Remove one or more images
+	run         Run a command in a new container
+	save        Save one or more images to a tar archive (streamed to STDOUT by default)
+	search      Search the Docker Hub for images
+	start       Start one or more stopped containers
+	stats       Display a live stream of container(s) resource usage statistics【显示容器资源使用统计数据的实时流】
+	stop        Stop one or more running containers
+	tag         Create a tag TARGET_IMAGE that refers to SOURCE_IMAGE【创建一个引用SOURCE_IMAGE的标签TARGET_IMAGE】
+	top         Display the running processes of a container【显示容器的运行进程】
+	unpause     Unpause all processes within one or more containers【不要暂停一个或多个容器中的所有进程】
+	update      Update configuration of one or more containers【更新一个或多个容器的配置】
+	version     Show the Docker version information
+	wait        Block until one or more containers stop, then print their exit codes【阻塞直到一个或多个容器停止，然后打印它们的退出码】
+
+
+
+
+详解：
+格式：docker  Management  Commands
+Management Commands:
+	config：Manage Docker configs
+		Commands:
+			create      Create a configuration file from a file or STDIN as content
+			inspect     Display detailed information on one or more configuration files
+			ls          List configs
+			rm          Remove one or more configuration files
+
+	container：Manage containers
+		Commands:
+			attach      Attach local standard input, output, and error streams to a running container
+			commit      Create a new image from a container's changes
+			cp          Copy files/folders between a container and the local filesystem
+			create      Create a new container
+			diff        Inspect changes to files or directories on a container's filesystem
+			exec        Run a command in a running container
+			export      Export a container's filesystem as a tar archive
+			inspect     Display detailed information on one or more containers
+			kill        Kill one or more running containers
+			logs        Fetch the logs of a container
+			ls          List containers
+			pause       Pause all processes within one or more containers
+			port        List port mappings or a specific mapping for the container
+			prune       Remove all stopped containers
+			rename      Rename a container
+			restart     Restart one or more containers
+			rm          Remove one or more containers
+			run         Run a command in a new container
+			start       Start one or more stopped containers
+			stats       Display a live stream of container(s) resource usage statistics
+			stop        Stop one or more running containers
+			top         Display the running processes of a container
+			unpause     Unpause all processes within one or more containers
+			update      Update configuration of one or more containers
+			wait        Block until one or more containers stop, then print their exit codes
+
+	image：Manage images
+		Commands:
+			build       Build an image from a Dockerfile
+			history     Show the history of an image
+			import      Import the contents from a tarball to create a filesystem image
+			inspect     Display detailed information on one or more images
+			load        Load an image from a tar archive or STDIN
+			ls          List images
+			prune       Remove unused images
+			pull        Pull an image or a repository from a registry
+			push        Push an image or a repository to a registry
+			rm          Remove one or more images
+			save        Save one or more images to a tar archive (streamed to STDOUT by default)
+			tag         Create a tag TARGET_IMAGE that refers to SOURCE_IMAGE
+
+
+	network：Manage networks
+		Commands:
+			connect     Connect a container to a network
+			create      Create a network
+			disconnect  Disconnect a container from a network
+			inspect     Display detailed information on one or more networks
+			ls          List networks
+			prune       Remove all unused networks
+			rm          Remove one or more networks
+
+	node：Manage Swarm nodes【管理群节点】
+		Commands:
+			demote      Demote one or more nodes from manager in the swarm
+			inspect     Display detailed information on one or more nodes
+			ls          List nodes in the swarm
+			promote     Promote one or more nodes to manager in the swarm
+			ps          List tasks running on one or more nodes, defaults to current node
+			rm          Remove one or more nodes from the swarm
+			update      Update a node
+
+	plugin：Manage plugins
+		Commands:
+			create      Create a plugin from a rootfs and configuration. Plugin data directory must contain config.json and rootfs directory.
+			disable     Disable a plugin
+			enable      Enable a plugin
+			inspect     Display detailed information on one or more plugins
+			install     Install a plugin
+			ls          List plugins
+			push        Push a plugin to a registry
+			rm          Remove one or more plugins
+			set         Change settings for a plugin
+			upgrade     Upgrade an existing plugin
+
+	secret：Manage Docker secrets
+		Commands:
+			create      Create a secret from a file or STDIN as content
+			inspect     Display detailed information on one or more secrets
+			ls          List secrets
+			rm          Remove one or more secrets
+
+	service：Manage services
+		Commands:
+			create      Create a new service
+			inspect     Display detailed information on one or more services
+			logs        Fetch the logs of a service or task
+			ls          List services
+			ps          List the tasks of one or more services
+			rm          Remove one or more services
+			rollback    Revert changes to a service's configuration
+			scale       Scale one or multiple replicated services
+			update      Update a service
+
+	stack：Manage Docker stacks
+		Commands:
+			deploy      Deploy a new stack or update an existing stack
+			ls          List stacks
+			ps          List the tasks in the stack
+			rm          Remove one or more stacks
+			services    List the services in the stack
+
+	swarm：Manage Swarm【管理群】
+		Commands:
+			ca          Display and rotate the root CA
+			init        Initialize a swarm
+			join        Join a swarm as a node and/or manager
+			join-token  Manage join tokens
+			leave       Leave the swarm
+			unlock      Unlock swarm
+			unlock-key  Manage the unlock key
+			update      Update the swarm
+
+	system：Manage Docker
+		Commands:
+			df          Show docker disk usage
+			events      Get real time events from the server
+			info        Display system-wide information
+			prune       Remove unused data
+
+	volume：Manage volumes
+		Commands:
+			create      Create a volume
+			inspect     Display detailed information on one or more volumes
+			ls          List volumes
+			prune       Remove all unused volumes
+			rm          Remove one or more volumes
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
