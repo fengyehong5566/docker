@@ -1,80 +1,80 @@
-dockerfile��д
-	һ��ģ�Dockerfile ��Ϊ�Ĳ��֣�����������Ϣ��ά������Ϣ���������ָ�����������ʱִ��ָ�
-		Dockerfile ��һ�������������ɣ�����֧���ԡ�#����ͷ��ע���С�
-		��ʼ����ָ���������ڵľ������ƣ�Ȼ��˵��ά������Ϣ���پ������ָ������CMDָ�ָ�����������Ĳ������
+﻿dockerfile编写
+	一般的，Dockerfile 分为四部分：基础镜像信息、维护者信息、镜像操作指令和容器启动时执行指令。
+		Dockerfile 由一行行命令语句组成，并且支持以”#“开头的注释行。
+		开始必须指明：所基于的镜像名称，然后说明维护者信息，再镜像操作指令，最后是CMD指令【指定运行容器的操作命令】
 		
-	ָ�
-		��ʽ��INSTRUCTION arguments
-		FROM��
-			��ʽ��FROM <image>  or  FROM <image>:<tag>
-				��һ��ָ�����ΪFROM��
-				���ͬһ��Dockerfile�д�����������ǣ�����ʹ�ö��FROMָ�ÿ������һ�Ρ�
-		MAINTAINER��
-			��ʽ��MAINTAINER <name> 
-				ָ��ά������Ϣ
-		RUN��
-			��ʽ1��RUN <command>  
-				��shell�ն������������/bin/sh  -c;
-			��ʽ2��RUN ["executable","param1","param2"]
-				ʹ��execִ�У�ָ�������ն˿�ʹ�ô˸�ʽʵ�֣�RUN ["/bin/bash","-c","echo hello"]
-			ÿ��RUNָ���ڵ�ǰ���������ִ��ָ��������ύΪ�µľ��񡣵�����ϳ�ʱ������ʹ��"\"������
-		CMD��
-			��ʽ1��CMD ["executable","param1","param2"]
-				ʹ��execִ�У��Ƽ��˷�ʽ
-			��ʽ2��CMD command param1  param2
-				��/bin/sh��ִ�У��ṩ����Ҫ������Ӧ��
-			��ʽ3��CMD ["param1","param2"]
-				�ṩ��ENTRYPOINT��Ĭ�ϲ���
-			ָ����������ʱִ�е����ÿ��Dockerfileֻ����һ��CMD����������CMD��ִֻ�����һ����
-			����û���������ʱָ�������������Ḳ�ǵ�CMDָ��������
-		EXPOSE��
-			��ʽ��EXPOSE  <port> [<port>...]
-			ָ��������¶�˿ںţ�������ϵͳʹ�á�
-			����������ʱ��Ҫͨ��-P��Docker�������Զ�����һ���˿�ת����ָ���Ķ˿�
+	指令：
+		格式：INSTRUCTION arguments
+		FROM：
+			格式：FROM <image>  or  FROM <image>:<tag>
+				第一条指令必须为FROM；
+				如果同一个Dockerfile中创建多个镜像是，可以使用多个FROM指令【每个镜像一次】
+		MAINTAINER：
+			格式：MAINTAINER <name> 
+				指定维护者信息
+		RUN：
+			格式1：RUN <command>  
+				在shell终端中运行命令，即/bin/sh  -c;
+			格式2：RUN ["executable","param1","param2"]
+				使用exec执行；指定其他终端可使用此格式实现：RUN ["/bin/bash","-c","echo hello"]
+			每天RUN指令在当前镜像基础上执行指定命令，并提交为新的镜像。当命令较长时，可以使用"\"来换行
+		CMD：
+			格式1：CMD ["executable","param1","param2"]
+				使用exec执行，推荐此方式
+			格式2：CMD command param1  param2
+				在/bin/sh中执行，提供给需要交换的应用
+			格式3：CMD ["param1","param2"]
+				提供给ENTRYPOINT的默认参数
+			指定启动容器时执行的命令，每个Dockerfile只能有一条CMD命令，如果多条CMD，只执行最后一条；
+			如果用户启动容器时指定了运行命令，则会覆盖掉CMD指定的命令
+		EXPOSE：
+			格式：EXPOSE  <port> [<port>...]
+			指定容器暴露端口号，供互联系统使用。
+			在启动容器时需要通过-P，Docker主机会自动分配一个端口转发到指定的端口
 			
-		ENV��
-			��ʽ��ENV  <key>  <value>
-			ָ��һ�������������ᱻ����RUNָ��ʹ�ã��������������Ǳ��֡�
+		ENV：
+			格式：ENV  <key>  <value>
+			指定一个环境变量，会被后续RUN指令使用，并在容器运行是保持。
 		
-		ADD��
-			��ʽ��ADD <src> <dest>
-				����ָ����<src>�������е�<dest>��
-				<src>������Dockerfile����Ŀ¼�����·����Ҳ������һ��URL����������TAR�ļ�(�Զ���ѹΪĿ¼)
+		ADD：
+			格式：ADD <src> <dest>
+				复制指定的<src>到容器中的<dest>。
+				<src>可以是Dockerfile所在目录的相对路径、也可以是一个URL，还可以是TAR文件(自动解压为目录)
 		
-		COPY��
-			��ʽ��COPY <src>  <dest>
-				���Ʊ���������<src>��ΪDockerfile����Ŀ¼�����·������������<dest>
-				ʹ�ñ���Ŀ¼ΪԴĿ¼�ǣ��Ƽ�ʹ��COPY
+		COPY；
+			格式：COPY <src>  <dest>
+				复制本地主机的<src>（为Dockerfile所在目录的相对路径）到容器的<dest>
+				使用本地目录为源目录是，推荐使用COPY
 		
-		ENTRYPOINT��
+		ENTRYPOINT：
 				ENTRYPOINT ["executable","param1","param2"]
-				ENTRYPOINT command param1 param2  [��shell��ִ��]
-				��������������ִ�е�������Ҳ��ɱ�docker run�ṩ�Ĳ�������
-				ÿ��Dockerfile��ֻ����һ��ENTRYPOINT,��ָ�����ʱ��ֻ�����һ����Ч
+				ENTRYPOINT command param1 param2  [在shell中执行]
+				配置容器启动后执行的命令，并且不可被docker run提供的参数覆盖
+				每个Dockerfile中只能有一个ENTRYPOINT,当指定多个时，只有最后一个有效
 			
-		VOLUME��
-			��ʽ��VOLUME  ["/data"]
-			����һ�����Դӱ��������������������صĹ��ص㣬һ������������ݿ����Ҫ���ֵ����ݵ�
+		VOLUME：
+			格式：VOLUME  ["/data"]
+			创建一个可以从本地主机或其他容器挂载的挂载点，一般用来存放数据库和需要保持的数据等
 		
-		USER��
-			��ʽ��USER  daemon
-			ָ����������ʱ���û�����UID��������RUNҲ��ʹ��ָ���û���
-			��������Ҫ����ԱȨ���ǣ�����ͨ��������ָ�������û������ҿ�����֮ǰ��������Ҫ���û����磺RUN groupadd -r postpres  && useradd -r -g postgres  postgres
-			Ҫ��ʱ��ȡ����ԱȨ�޿���ʹ��  gosu �����Ƽ�sudo
+		USER：
+			格式：USER  daemon
+			指定运行容器时的用户名或UID，后续的RUN也会使用指定用户。
+			当服务不需要管理员权限是，可以通过该命令指定运行用户。并且可以在之前创建所需要的用户，如：RUN groupadd -r postpres  && useradd -r -g postgres  postgres
+			要临时获取管理员权限可以使用  gosu ，不推荐sudo
 			
-		WORKDIR��
-			��ʽ��WORKDIR /path/to/workdir
-				Ϊ������RUN��CMD��ENTRYPOINTָ�����ù���Ŀ¼
-				����ʹ�ö��WORKDIRָ���������������������·����������֮ǰ����ָ����·��
+		WORKDIR：
+			格式：WORKDIR /path/to/workdir
+				为后续的RUN、CMD、ENTRYPOINT指令配置工作目录
+				可以使用多个WORKDIR指令，后续命令如果参数是相对路径，则会基于之前命令指定的路径
 		
-		ONBUILD��
-			��ʽ��ONBUILD  [INSTRUCTION]
-			���õ��������ľ�����Ϊ�����´����Ļ�������ʱ����ִ�еĲ���ָ�
-	��������
-		��д���Dockerfile֮��ͨ��docker build���������
-		��ʽ��docker build [ѡ��]  path 
-			��ȡָ��·���£�������Ŀ¼����Dockerfile��������·�����������ݷ��͸�Docker����ˣ��з����������������˽������Dockerfile��Ŀ¼Ϊ��Ŀ¼��Ҳ����ͨ��.dockerignore�ļ���ÿ������һ��ƥ��ģʽ������Docker����·���µ�Ŀ¼���ļ���
-			Ҫ֪������ı�ǩ��Ϣ������ʹ�� -t ѡ�
+		ONBUILD：
+			格式：ONBUILD  [INSTRUCTION]
+			配置当所创建的镜像作为其它新创建的基础镜像时，所执行的操作指令。
+	创建镜像：
+		编写完成Dockerfile之后，通过docker build命令创建镜像
+		格式：docker build [选项]  path 
+			读取指定路径下（包括子目录）的Dockerfile，并将该路径下所有内容发送给Docker服务端，有服务端来创建镜像，因此建议放置Dockerfile的目录为空目录，也可以通过.dockerignore文件（每行添加一条匹配模式）来让Docker忽略路径下的目录和文件。
+			要知道镜像的标签信息，可以使用 -t 选项。
 
 
 
