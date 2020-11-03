@@ -1,0 +1,29 @@
+1、首先确认安装好nvidia 驱动
+2、安装nvidia-container-runtime
+	distribution=$(. /etc/os-release;echo $ID$VERSION_ID)
+	curl -s -L https://nvidia.github.io/nvidia-container-runtime/$distribution/nvidia-container-runtime.repo | \
+  sudo tee /etc/yum.repos.d/nvidia-container-runtime.repo
+	
+	yum -y install nvidia-container-runtime
+
+	which nvidia-container-runtime-hook
+
+3、restart docker服务
+4、启动docker加入 --gpus
+	例：
+		指定所有gpu
+		docker run -it --rm --gpus all ubuntu nvidia-smi
+		
+		指定某个gpu
+		$ docker run -it --rm --gpus device=GPU-3a23c669-1f69-c64e-cf85-44e9b07e7a2a ubuntu nvidia-smi
+		docker run -it --rm --gpus device=0,2 nvidia-smi
+		
+		手动设置nvidia功能
+		 docker run --gpus 'all,capabilities=utility' --rm ubuntu nvidia-smi
+		 utility：添加nvidia-smi 到容器中
+  
+  
+  
+  
+详情见：
+https://nvidia.github.io/nvidia-container-runtime/

@@ -1,0 +1,214 @@
+#dockerfile  
+
+    一般的，Dockerfile 分为四部分：
+        1、基础镜像信息
+        2、维护者信息
+        3、镜像操作指令
+        4、容器启动时执行指令。
+    Dockerfile 由一行行命令语句组成，并且支持以”#“开头的注释行。
+    开始必须指明：所基于的镜像名称，然后说明维护者信息，再镜像操作指令，最后是CMD指令【指定运行容器的操作命令】
+        
+#指令：
+        格式：INSTRUCTION arguments  
+
+        FROM：
+            格式： FROM <image>    
+                  FROM <image>:<tag> [AS <name>] 
+                  FROM scratch
+                第一条指令必须为FROM；
+                如果同一个Dockerfile中创建多个镜像, 是可以使用多个FROM指令【每个镜像一次】
+
+        MAINTAINER：
+            格式：MAINTAINER <name> 
+                指定维护者信息
+
+        LABEL:
+            格式：LABEL key=value ......
+            给镜像添加元数据，可以用 LABEL 命令替换 MAINTAINER 命令。指定一些作者、邮箱等信息。
+            LABEL会继承基础镜像种的LABEL，如遇到key相同，则值覆盖
+
+        RUN：
+            格式1：RUN <command>  
+                在shell终端中运行命令，即/bin/sh  -c;
+            格式2：RUN ["executable","param1","param2"]
+                使用exec执行；指定其他终端可使用此格式实现：RUN ["/bin/bash","-c","echo hello"]
+            每条RUN指令在当前镜像基础上执行指定命令，并提交为新的镜像。当命令较长时，可以使用"\"来换行
+
+        CMD：
+            格式1：CMD ["executable","param1","param2"]
+                使用exec执行，推荐此方式
+            格式2：CMD command param1  param2
+                在/bin/sh中执行，提供给需要交换的应用，执行中会被识别为：CMD ["sh","-c","command param1 param2"]
+            格式3：CMD ["param1","param2"]
+                提供给ENTRYPOINT的默认参数
+            指定启动容器时默认执行的命令，每个Dockerfile只能有一条CMD命令，如果多条CMD，只执行最后一条；
+            如果用户启动容器时指定了运行命令，则会覆盖掉CMD指定的命令
+
+        EXPOSE：
+            格式：EXPOSE  <port> [<port>...]
+            指定容器暴露端口号，供互联系统使用。 
+            EXPOSE 仅仅是声明容器打算使用什么端口而已，并不会自动在宿主进行端口映射。
+            在启动容器时需要通过-P，Docker主机会自动分配一个端口转发到指定的端口
+            指定容器运行时对外暴露的端口，但是该指定实际上不会发布该端口，它的功能是镜像构建者和容器运行者之间的记录文件。
+            仅仅是声明运行时容器提供服务端口，这只是一个声明，在运行时并不会因为这个声明应用就会开启这个端口的服务。
+            两个好处：
+                1、是帮助镜像使用者理解这个镜像服务的守护端口，以方便配置映射；
+                2、是在运行时使用随机端口映射时，也就是 docker run -P 时，会自动随机映射 EXPOSE 的端口。
+
+        ENV：
+            格式：ENV  <key>  <value>
+            指定一个环境变量，会被后续RUN指令使用，并在容器运行是保持。
+        
+        ADD：
+            格式：ADD <src> <dest>
+            复制指定的<src>到容器中的<dest>。
+            <src>可以是Dockerfile所在目录的相对路径、也可以是一个URL，还可以是TAR文件(自动解压为目录)
+        
+        COPY；
+            格式：COPY <src>  <dest>
+            复制本地主机的<src>（为Dockerfile所在目录的相对路径）到容器的<dest>，如果dest不存在则创建
+            使用本地目录为源目录，推荐使用COPY
+            
+             COPY选项： --chown=<user>:<group>
+                COPY --chown=55:mygroup files* /somedir/
+                COPY --chown=bin files* /somedir/
+                COPY --chown=1 files* /somedir/
+                COPY --chown=10:11 files* /somedir/
+            如果容器根文件系统不包含/etc/passwd或 /etc/group文件，并且在--chown 标志中使用了用户名或组名，则该构建将在该COPY操作上失败。
+            使用数字ID不需要查找，并且不依赖于容器根文件系统内容。
+            
+            COPY选项： --from=<name|index>
+            该标记将src设置为 先前构建阶段(FROM ... AS ...)，而不是构建的上下文。
+            
+
+        ENTRYPOINT：
+            ENTRYPOINT ["executable","param1","param2"]
+            ENTRYPOINT command param1 param2  [在shell中执行]
+            配置容器启动后执行的命令，并且不可被docker run提供的参数覆盖
+            每个Dockerfile中只能有一个ENTRYPOINT,当指定多个时，只有最后一个有效
+            
+        VOLUME：
+            格式：VOLUME  ["/data"]
+            创建一个可以从本地主机或其他容器挂载的挂载点，一般用来存放数据库和需要保持的数据等
+        
+        USER：
+            格式：USER  daemon
+            指定运行容器时的用户名或UID，后续的RUN也会使用指定用户。
+            当服务不需要管理员权限是，可以通过该命令指定运行用户。并且可以在之前创建所需要的用户，
+            如：RUN groupadd -r postpres  && useradd -r -g postgres  postgres
+            要临时获取管理员权限可以使用  gosu ，不推荐sudo
+            
+        WORKDIR：
+            格式：WORKDIR /path/to/workdir
+            为后续的RUN、CMD、ENTRYPOINT指令配置工作目录
+            可以使用多个WORKDIR指令，后续命令如果参数是相对路径，则会基于之前命令指定的路径
+            如果目录不存在则自动创建
+        ARG：
+            格式：ARG <name>[=<defaultvalue>]
+            指定在镜像构建时可传递的变量，定义的变量可以通过 docker build --build-arg = 的方式在构建时设置。
+        
+        ONBUILD：
+            格式：ONBUILD  [INSTRUCTION]
+            配置当所创建的镜像作为其它新创建的基础镜像时，所执行的操作指令。比如 RUN , COPY 等
+        
+        STOPSIGNAL：
+            格式：STOPSIGNAL  signal
+            设置当容器停止时给系统发送的什么样的指令！默认15
+            
+        HEALTHCHECK：
+            格式：HEALTHCHECK  [options] CMD command   （在容器内运行命令检测容器的运行情况）
+            HEALTHCHECK  NONE   （禁止从父镜像继承检查）
+            该指令可以告诉 Docker 怎么去检测一个容器的运行状况！
+            只可以出现一次，如果出现多次，最后一个生效
+            [OPTIONS]的选项支持以下三中选项：
+                –interval=DURATION 两次检查默认的时间间隔为30秒
+                –timeout=DURATION 健康检查命令运行超时时长，默认30秒
+                –retries=N 当连续失败指定次数后，则容器被认为是不健康的，状态为unhealthy，默认次数是3
+            注意：
+                HEALTHCHECK命令只能出现一次，如果出现了多次，只有最后一个生效。
+                CMD后边的命令的返回值决定了本次健康检查是否成功，具体的返回值如下：
+                0: success - 表示容器是健康的
+                1: unhealthy - 表示容器已经不能工作了
+                2: reserved - 保留值
+
+        SHELL：
+            格式：SHELL ["executable"，"parameters"]
+            用于设置执行命令所使用的默认的 Shell 类型！
+            该指令在 Windows 操作系统下比较有用，因为Win下通常会有 CMD 和 Powershell 两种 Shell，甚至还有 SH。
+            
+    RUN、CMD、ENTRYPOINT 区别：
+        RUN 是在镜像构建时运行，后两个是在容器启动时执行！
+        CMD 设置的命令是容器启动时默认运行的命令。
+            1、如果 docker run 没有指定任何的命令，且 Dockerfile 中没有 ENTRYPOINT，那容器启动的时候就会执行 CMD 指定的命令！相当于缺省参数！
+            2、如果设置了 ENTRYPOINT 指令，则优先使用！并且可以通过 docker run 给该指令设置的命令传参！
+        ENTRYPOINT 容器启动时的默认的运行命令，CMD指定的相当于ENTRYPOINT的参数，如果docker run指定参数，会覆盖CMD
+    
+    
+    
+#创建镜像：
+        格式：docker build [选项]  上下文路径path 
+            读取指定路径下（包括子目录）的Dockerfile，并将该路径下所有内容发送给Docker服务端，有服务端来创建镜像，因此建议放置Dockerfile的目录为空目录，也可以通过.dockerignore文件（每行添加一条匹配模式）来让Docker忽略路径下的目录和文件。
+            要知道镜像的标签信息，可以使用 -t 选项。
+
+        指令失败时会怎样？
+            我们可以通过 docker run命令  基于这次构建到目前为止已经成功的最后一步   创建一个容器，进行调试
+            修改错误后，再次尝试进行构建。
+            
+        构建缓存：
+            docker build 在构建镜像过程中，docker会将前一个RUN命令结果的镜像层看作缓存（每执行一个RUN都会产生一个镜像层）。
+            有时候为确保构建过程不适用缓存，可以使用  “dockers build  --no-cache  ......”
+
+        镜像构建上下文（Context）
+            一般docker build 命令最后会有“.” ；“.”表示当前目录，而 Dockerfile就在当前目录，so很多人以为这个路径是在指定 Dockerfile 所在路径，这么理解错误的。这是在指定上下文路径。那么什么是上下文呢？
+
+            首先看看docker build 的工作原理。Docker服务在运行时分为Docker引擎（就是服务端守护进程）和客户端工具。Docker引擎提供了一组 REST API，被称为 DockerRemote API。docker命令是通过这组 API 与 Docker 引擎交互，从而完成各种功能。虽然表面上我们好像是在本机使用docker命令执行各种功能，但实际上一切都是使用的远程调用形式在服务端（Docker 引擎）完成，即 C/S 架构。
+            在进行镜像构建时，有时需要将一些本地文件复制进镜像，比如COPY、ADD等。而 docker build 命令构建镜像，其实并非在本地构建，而是在服务端。那么在这种C/S架构中，如何才能让服务端获得本地文件呢？
+            这就引入了上下文的概念。当构建的时候，用户会指定构建镜像上下文的路径， docker build 命令得知这个路径后，会将路径下的所有内容打包，然后上传给 Docker 引擎。这样Docker引擎收到这个上下文包后，展开就会获得构建镜像所需的一切文件。
+
+            一般来说，应该会将 Dockerfile 置于一个空目录下，或者项目根目录下。如果该目录下没有所需文件，那么应该把所需文件复制一份过来。如果目录下有些东西确实不希望构建时传给 Docker 引擎，那么可以用 .gitignore 一样的语法写一个 .dockerignore ，该文件是用于剔除不需要作为上下文传递给 Docker 引擎的。
+
+            那么为什么会有人误以为“.”是指定 Dockerfile 所在目录呢？这是因为在默认情况下，如果不额外指定 Dockerfile 的话，会将上下文目录下的名为 Dockerfile 的文件作为 Dockerfile。
+            这只是默认行为，实际上 Dockerfile 的文件名并不要求必须为 Dockerfile ，而且并不要求必须位于上下文目录中，可以用 “-f”指定Dockerfile。
+
+
+**注**：  
+    1、Docker 不是虚拟机，容器中的应用都应该以前台执行，容器没有后台服务的概念  
+       对于容器而言，其启动程序就是容器应用进程，容器就是为了主进程而存在的，主进程退出，容器就失去了存在的意义，从而退出，其它辅助进程不是它需要关心的东西  
+       例：CMD [ “sh”, “-c”, “service nginx start”] ，因此主进程实际上是 sh 。那么当 service nginx start 命令结束后， sh 也就结束了， sh 作为主进程退出了，自然就会令容器退出。  
+
+
+    在Dockerfile中使用变量的方式
+        $varname
+        ${varname}
+        ${varname:-default value}
+        $(varname:+default value}
+    第一种和第二种相同
+    第三种表示当变量不存在使用-号后面的值
+    第四种表示当变量存在时使用+号后面的值（当然不存在也是使用后面的值）
+
+ 
+
+#精简docker镜像技巧
+
+精简镜像的好处：  
+>    1、减少构建时间  
+>    2、减少磁盘使用量   
+>    3、减少下载时间  
+>    4、因为包含文件少，攻击面减小，提高安全性  
+>    5、提高部署速度  
+
+技巧：  
+>　　使用较小的基础镜像  
+>　　　　1、scratch镜像（空镜像）  
+>　　　　2、busybox镜像（包含常用命令，只有1.16M）  
+>　　　　3、alpine镜像（高度精简又包含基本工具的linux发行版，4.41M）  
+>　　将多个命令集中放在一行  (减少图层数量)  
+>　　　　使用 && 和 \  
+　　　　
+>　　使用多阶段构建  
+>　　　　COPY --from 和 FROM ...  AS ..  
+>　　多行参数排序  
+>　　使用缓存加快构建速度  
+>　　清理缓存和不必要的文件  
+>　　通过.dockerignore文件排除   
+>　　压缩镜像   
