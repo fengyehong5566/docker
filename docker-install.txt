@@ -1,0 +1,15 @@
+#安装依赖包
+yum install -y yum-utils device-mapper-persistent-data lvm2
+
+添加docker软件包源
+yum-config-manager \
+--add-repo \
+https://download.docker.com/linux/centos/docker-ce.repo
+
+安装Docker CE
+yum install  docker-ce  
+
+启动 Docker 服务并设置开机自启
+systemctl start docker
+systemctl enable docker
+
